@@ -1,0 +1,10 @@
+# Packaged local baseline from Ultralytics 8.4.145 cfg/trackers/bytetrack.yaml.
+# Upstream: Ultralytics, AGPL-3.0, https://ultralytics.com/license
+# The service's bytetrack_v1.yaml was not supplied. This is not an exact replica.
+tracker_type: bytetrack
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 30
+match_thresh: 0.8
+fuse_score: true

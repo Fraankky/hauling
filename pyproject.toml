@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hauling-offline"
+version = "0.2.0"
+description = "Local hauling vehicle tracking and calibrated speed measurement"
+requires-python = ">=3.11"
+dependencies = [
+  "ultralytics==8.4.145", "torch==2.12.1", "torchvision==0.27.1",
+  "opencv-python==5.0.0.93", "numpy==2.4.6", "lap==0.5.13", "PyYAML==6.0.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.0.3", "ruff>=0.14"]
+
+[project.scripts]
+hauling = "hauling.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["hauling*"]
+
+[tool.setuptools.package-data]
+hauling = ["configs/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["smoke: requires supplied local vehicle model and video"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+# Notebook Colab bukan kode paket: sel `!pip` dan urutan import-nya sengaja begitu.
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
