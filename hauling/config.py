@@ -67,6 +67,8 @@ class Config:
     plate_classifier_imgsz: int = 96
     plate_min_crop_size: int = 16
     plate_char_min_conf: float = 0.0
+    # 0 disables the classifier gate; 0.65 kills the border-line "1" ghosts (audit km18).
+    plate_char_class_min_conf: float = 0.0
     plate_preprocess: str = "none"
     plate_deskew: bool = False
     plate_max_ocr_frames: int = 0
@@ -366,6 +368,7 @@ def load_config(path: Path) -> Config:
         plate_classifier_imgsz=_optional_integer(section, "plate_classifier_imgsz", 96, minimum=32),
         plate_min_crop_size=_optional_integer(section, "plate_min_crop_size", 16, minimum=4),
         plate_char_min_conf=_optional_float(section, "plate_char_min_conf", 0.0),
+        plate_char_class_min_conf=_optional_float(section, "plate_char_class_min_conf", 0.0),
         plate_preprocess=_optional_preprocess(section, "plate_preprocess"),
         plate_deskew=_optional_bool(section, "plate_deskew", False),
         plate_max_ocr_frames=_optional_integer(section, "plate_max_ocr_frames", 0, maximum=10000),

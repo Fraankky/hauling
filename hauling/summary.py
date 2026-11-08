@@ -1,12 +1,119 @@
 """Build grouped run_summary.json sections from completed pipeline state."""
 
+import json
+import time
+from pathlib import Path
 from typing import Any
 
 from hauling import __version__
 from hauling.config import Config
-from hauling.contraflow import COVERAGE_GRID, MIN_CONFIRM_FRAMES
+from hauling.contraflow import (
+    COVERAGE_GRID,
+    MIN_CONFIRM_FRAMES,
+    STATUS_DIRECTION_UNKNOWN,
+    STATUS_LEGAL_FLOW,
+    STATUS_OUTSIDE,
+    STATUS_UNCONFIRMED,
+    STATUS_VIOLATION,
+)
 from hauling.distance import MIN_HEADWAY_S
+from hauling.options import RunOptions
+from hauling.plate import DISABLED_NOTE
 from hauling.state import TrackState
+
+
+def initialize_summary(options: RunOptions, config: Config) -> dict:
+    """Create the flat summary contract before runtime resources open."""
+    plate_enabled = options.plate_character_model is not None
+    models = {
+        name: str(path.resolve())
+        for name, path in (
+            ("vehicle", options.vehicle_model),
+            ("digit_detector", options.plate_character_model),
+            ("letter_detector", options.plate_letter_character_model),
+            ("digit_classifier", options.plate_digit_model),
+            ("letter_classifier", options.plate_letter_model),
+        )
+        if path is not None
+    }
+    formats = {Path(path).suffix.lower() for path in models.values()}
+    runtime = None
+    if formats:
+        runtime = (
+            {".pt": "pytorch", ".engine": "tensorrt"}.get(next(iter(formats)))
+            if len(formats) == 1
+            else "mixed"
+        )
+    summary = {
+        "source_video": str(options.video.resolve()),
+        "fps": None,
+        "resolution": None,
+        "total_frames": 0,
+        "total_detections": 0,
+        "unique_tracks": 0,
+        "events": 0,
+        "speed_valid": 0,
+        "overspeed": 0,
+        "unsafe_distance": 0,
+        "unsafe_distance_limit_s": config.unsafe_distance_limit_s,
+        "headway_normal": 0,
+        "headway_artifact": 0,
+        "headway_no_lead": 0,
+        "headway_no_final": 0,
+        "contraflow_violation": 0,
+        "contraflow_legal_flow": 0,
+        "contraflow_direction_unknown": 0,
+        "contraflow_outside": 0,
+        "contraflow_unconfirmed": 0,
+        "contraflow_inactive": 0,
+        "contraflow_evidence": 0,
+        "plate_detected": 0,
+        "plate_detection_enabled": plate_enabled,
+        "unfinished_tracks": 0,
+        "lost_before_final": 0,
+        "events_from_finish": 0,
+        "north_detected": 0,
+        "plate_no_read": 0,
+        "plate_single_read": 0,
+        "plate_no_agreement": 0,
+        "ocr_frames": 0,
+        "ocr_attempts": 0,
+        "ocr_band_found": 0,
+        "ocr_chars_found": 0,
+        "ocr_decode_ok": 0,
+        "plate_crop_suspect": 0,
+        "plate_rel_w_max": 0.0,
+        "plate_rel_h_max": 0.0,
+        "plate_sharpness_max": 0.0,
+        "plate_reads_debug": {},
+        "_speeds": [],
+        "duration_seconds": 0.0,
+        "timing_seconds": {"video_decode": 0.0, "vehicle_detect": 0.0, "plate_read": 0.0},
+        "warnings": [],
+        "errors": [],
+        "status": "running",
+        "stop_reason": None,
+        "video_requested": options.save_video,
+        "video_written": False,
+        "vehicle_model": str(options.vehicle_model.resolve()) if options.vehicle_model else None,
+        "models": models,
+        "model_runtime": runtime,
+        "tracker_config": str(options.tracker_config.resolve()) if options.tracker_config else None,
+        "tracker_fallback": options.tracker_fallback,
+        "device": None,
+        "timestamp_source": "frame_index / video_fps (CFR)",
+        "versions": {},
+    }
+    if not plate_enabled:
+        summary["warnings"].append(DISABLED_NOTE)
+    if config.unsafe_distance_limit_s <= MIN_HEADWAY_S:
+        summary["warnings"].append(
+            f"unsafe_distance_limit={config.unsafe_distance_limit_s} is at or below the "
+            f"{MIN_HEADWAY_S} s artifact floor; no unsafe-distance violation can be reported"
+        )
+    if options.tracker_fallback:
+        summary["warnings"].append("Reference tracker missing; using local Ultralytics ByteTrack baseline")
+    return summary
 
 
 def _band_y(polygons: dict[str, Any], name: str) -> tuple[float, float]:
@@ -231,3 +338,53 @@ def _summary_sections(
         },
     }
 
+
+def finalize_summary(
+    summary: dict,
+    config: Config,
+    states: dict[int, TrackState],
+    polygons: dict[str, Any],
+    measurements: dict[int, dict],
+    output_dir: Path,
+    started: float,
+) -> None:
+    """Complete runtime counters and always persist ``run_summary.json``."""
+    summary["unique_tracks"] = len(states)
+    south = [state for state in states.values() if state.first_centroid is not None and state.direction == "South"]
+    summary["north_detected"] = sum(
+        state.first_centroid is not None and state.direction == "North" for state in states.values()
+    )
+    unfinished = [state for state in south if not state.event_written]
+    summary["unfinished_tracks"] = len(unfinished)
+    summary["lost_before_final"] = sum(
+        state.last_frame_index < summary["total_frames"] - 1 for state in unfinished
+    )
+    summary["unfinished_detail"] = [
+        {
+            "track_id": state.track_id,
+            "vehicle_class": state.vehicle_class,
+            "direction": state.direction,
+            "start_s": state.start_timestamp,
+            "finish_s": state.end_timestamp,
+            "final_s": state.final_timestamp,
+            "last_frame": state.last_frame_index,
+            "plate_reads": state._lambung_reads,
+        }
+        for state in unfinished
+    ]
+    summary["tracks_outside_areas"] = sum(state.first_centroid is None for state in states.values())
+    statuses = [state.contraflow_status for state in states.values()]
+    summary["contraflow_violation"] = statuses.count(STATUS_VIOLATION)
+    summary["contraflow_legal_flow"] = statuses.count(STATUS_LEGAL_FLOW)
+    summary["contraflow_direction_unknown"] = statuses.count(STATUS_DIRECTION_UNKNOWN)
+    summary["contraflow_outside"] = statuses.count(STATUS_OUTSIDE)
+    summary["contraflow_unconfirmed"] = statuses.count(STATUS_UNCONFIRMED)
+    summary["contraflow_inactive"] = statuses.count("inactive")
+    summary["duration_seconds"] = round(time.monotonic() - started, 3)
+    summary["timing_seconds"] = {
+        key: round(value, 3) for key, value in summary["timing_seconds"].items()
+    }
+    summary.update(_summary_sections(summary, config, states, polygons, measurements))
+    (output_dir / "run_summary.json").write_text(
+        json.dumps(summary, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+    )

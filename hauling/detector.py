@@ -164,6 +164,7 @@ class VehicleDetector:
         """Return normalized Vehicle observations without saving model side effects."""
         result = self.model.predict(
             source=frame,
+            rect=False,
             conf=self.config.conf,
             iou=self.config.iou,
             imgsz=self.config.imgsz,

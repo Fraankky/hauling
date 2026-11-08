@@ -442,6 +442,7 @@ class LambungReader:
         classifier_imgsz: int = 96,
         min_crop_size: int = MIN_CROP_SIZE,
         char_min_conf: float = 0.0,
+        char_class_min_conf: float = 0.0,
         preprocess: str = "none",
         deskew: bool = False,
     ) -> None:
@@ -460,6 +461,7 @@ class LambungReader:
         self.classifier_imgsz = classifier_imgsz
         self.min_crop_size = min_crop_size
         self.char_min_conf = char_min_conf
+        self.char_class_min_conf = char_class_min_conf
         self.preprocess = preprocess
         self.deskew = deskew
         from ultralytics import YOLO
@@ -479,6 +481,7 @@ class LambungReader:
         # per track, so a rejected read still reports its confidence.
         self.last_band_probability = 0.0
         self.last_debug: dict[str, Any] = {}
+        self._char_boxes: list[tuple[int, int, int, int]] = []
 
     @classmethod
     def find_signs(cls, vehicle_crop: np.ndarray, max_candidates: int = 3) -> list[tuple[int, int, int, int]]:
@@ -535,9 +538,13 @@ class LambungReader:
                 # Raw band (no pad/preprocess/upscale): the local evaluator
                 # re-applies those variants to it without needing the video.
                 "raw": vehicle_crop[y : y + h, x : x + w].copy(),
+                "band_bbox_xywh": sign,
+                "candidate_count": len(bands),
                 "band": sub,
                 "input": big,
                 "characters": characters,
+                "char_boxes": self._char_boxes.copy(),
+                "picked_indices": self._picked_indices,
                 "letters": letters,
                 "digits": digits,
                 "probability": probability,
@@ -568,6 +575,7 @@ class LambungReader:
         plate path.
         """
         characters = []
+        self._char_boxes = []
         for detector, classifier, source in (
             (self.digit_detector, self.digit_model, "d"),
             (self.letter_detector, self.letter_model, "l"),
@@ -584,11 +592,14 @@ class LambungReader:
                 if char_crop.size == 0:
                     continue
                 glyphs.append(char_crop)
-                positions.append(((x1 + x2) / 2, (y1 + y2) / 2, float(box_conf)))
+                positions.append(((x1 + x2) / 2, (y1 + y2) / 2, float(box_conf), (x1, y1, x2, y2)))
             if not glyphs:
                 continue
             results = classifier.predict(glyphs, imgsz=self.classifier_imgsz, device=self.digit_detector.device, verbose=False)
-            for (center_x, center_y, box_conf), result in zip(positions, results, strict=True):
+            for (center_x, center_y, box_conf, box), result in zip(positions, results, strict=True):
+                class_prob = float(result.probs.top1conf)
+                if class_prob < self.char_class_min_conf:
+                    continue
                 characters.append(
                     (
                         center_x,
@@ -596,9 +607,10 @@ class LambungReader:
                         result.names[int(result.probs.top1)],
                         source,
                         box_conf,
-                        float(result.probs.top1conf),
+                        class_prob,
                     )
                 )
+                self._char_boxes.append(box)
         return characters
 
     def _decode(self, characters: list[tuple[float, float, str, str, float, float]]) -> tuple[str, str, float]:
@@ -636,6 +648,7 @@ class LambungReader:
         letters_text = "".join(c[2] for c in picked_letters)
         digits_text = "".join(c[2] for c in picked_digits)
         picked = picked_letters + picked_digits
+        self._picked_indices = [next(i for i, candidate in enumerate(characters) if candidate is char) for char in picked]
         probability = sum(c[5] for c in picked) / len(picked) if picked else 0.0
         return letters_text, digits_text, probability
 

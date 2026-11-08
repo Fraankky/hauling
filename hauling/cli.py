@@ -1,18 +1,12 @@
-"""Command-line interface for the offline hauling pipeline."""
+"""Command-line arguments for the offline hauling pipeline."""
 
 import argparse
-import json
-import logging
-import traceback
-from dataclasses import replace
 from pathlib import Path
 
-from hauling.config import load_config
-from hauling.pipeline import RunOptions, run_pipeline
+from hauling.pipeline import run_pipeline
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Run one local video, returning a nonzero exit code on failure."""
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Offline hauling vehicle tracking and speed measurement")
     parser.add_argument("--video", type=Path, required=True)
     parser.add_argument("--vehicle-model", type=Path, required=True, help="Local vehicle model (.pt or .engine)")
@@ -43,66 +37,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--plate-conf", type=float, default=0.4, help="Plate/character confidence threshold (default: 0.4)")
     parser.add_argument("--plate-min-prob", type=float, default=0.0, help="Reject a final plate read below this classifier probability (default: 0.0 = off)")
     parser.add_argument("--plate-single-read-prob", type=float, default=None, help="Accept a lone read at or above this probability (default: off)")
-    args = parser.parse_args(argv)
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    try:
-        plate_models = (args.plate_character_model, args.plate_letter_model, args.plate_digit_classifier, args.plate_letter_classifier)
-        if any(plate_models) and not all(plate_models):
-            raise ValueError("Plate reading requires --plate-character-model, --plate-letter-model, --plate-digit-classifier and --plate-letter-classifier")
-        config = load_config(args.config)
-        if args.unsafe_distance_limit is not None:
-            if not args.unsafe_distance_limit > 0:
-                raise ValueError("--unsafe-distance-limit must be positive")
-            config = replace(config, unsafe_distance_limit_s=args.unsafe_distance_limit)
-        tracker = args.tracker_config or args.config.resolve().parent / config.tracker_config
-        fallback = False
-        if not tracker.is_file() and args.tracker_config is None:
-            tracker = Path(__file__).resolve().parent / "configs" / "bytetrack.yaml"
-            fallback = True
-        options = RunOptions(
-            video=args.video,
-            vehicle_model=args.vehicle_model,
-            tracker_config=tracker,
-            output_dir=args.output_dir,
-            device=args.device,
-            max_frames=args.max_frames,
-            save_video=not args.no_save_video,
-            threads=args.threads,
-            tracker_fallback=fallback,
-            plate_character_model=args.plate_character_model,
-            plate_letter_character_model=args.plate_letter_model,
-            plate_digit_model=args.plate_digit_classifier,
-            plate_letter_model=args.plate_letter_classifier,
-            plate_conf=args.plate_conf,
-            plate_min_prob=args.plate_min_prob,
-            plate_single_read_prob=args.plate_single_read_prob,
-            dump_plate_crops=args.dump_plate_crops,
-        )
-        summary = run_pipeline(options, config)
-    except KeyboardInterrupt:
-        logging.warning("Run interrupted; partial outputs and summary retained")
-        return 130
-    except Exception as error:
-        logging.error("%s: %s", type(error).__name__, error)
-        logging.debug("Traceback:", exc_info=True)
-        traceback.print_exc()
-        return 1
-    print(
-        json.dumps(
-            {
-                key: summary[key]
-                for key in (
-                    "status",
-                    "total_frames",
-                    "events",
-                    "speed_valid",
-                    "overspeed",
-                    "unsafe_distance",
-                    "unsafe_distance_limit_s",
-                    "duration_seconds",
-                )
-            },
-            indent=2,
-        )
-    )
-    return 0
+    return parser
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    return build_parser().parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Compatibility entry point for the installed ``hauling`` command."""
+    from hauling.main import run_command
+
+    return run_command(argv, pipeline_runner=run_pipeline)

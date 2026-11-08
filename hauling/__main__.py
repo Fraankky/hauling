@@ -1,5 +1,5 @@
 """Run with python -m hauling."""
 
-from hauling.cli import main
+from hauling.main import main
 
 raise SystemExit(main())
