@@ -1,0 +1,1146 @@
+{
+  "pytorch": {
+    "run": {
+      "frames": 7501,
+      "detections": 10483,
+      "ocr_attempts": 4369,
+      "events": 26,
+      "pipeline_wall": {
+        "calls": 1,
+        "total_ms": 414012.266,
+        "average_ms_per_call": 414012.266,
+        "average_ms_per_frame": 55.194
+      },
+      "configuration": {
+        "save_video": true,
+        "dump_plate_crops": false,
+        "cuda_synchronized": true
+      }
+    },
+    "pipeline_stages": {
+      "video_setup": {
+        "calls": 1,
+        "total_ms": 144.0,
+        "average_ms_per_call": 144.0,
+        "average_ms_per_frame": 0.019,
+        "pipeline_percent": 0.035
+      },
+      "vehicle_model_load": {
+        "calls": 1,
+        "total_ms": 120.0,
+        "average_ms_per_call": 120.0,
+        "average_ms_per_frame": 0.016,
+        "pipeline_percent": 0.029
+      },
+      "ocr_model_load": {
+        "calls": 1,
+        "total_ms": 321.0,
+        "average_ms_per_call": 321.0,
+        "average_ms_per_frame": 0.043,
+        "pipeline_percent": 0.078
+      },
+      "video_writer_setup": {
+        "calls": 1,
+        "total_ms": 14.0,
+        "average_ms_per_call": 14.0,
+        "average_ms_per_frame": 0.002,
+        "pipeline_percent": 0.003
+      },
+      "video_decode": {
+        "calls": 7502,
+        "total_ms": 29764.0,
+        "average_ms_per_call": 3.967,
+        "average_ms_per_frame": 3.968,
+        "pipeline_percent": 7.189
+      },
+      "vehicle_detect": {
+        "calls": 7501,
+        "total_ms": 202668.0,
+        "average_ms_per_call": 27.019,
+        "average_ms_per_frame": 27.019,
+        "pipeline_percent": 48.952
+      },
+      "event_logic": {
+        "calls": 7501,
+        "total_ms": 1130.0,
+        "average_ms_per_call": 0.151,
+        "average_ms_per_frame": 0.151,
+        "pipeline_percent": 0.273
+      },
+      "render_annotation": {
+        "calls": 7501,
+        "total_ms": 15296.0,
+        "average_ms_per_call": 2.039,
+        "average_ms_per_frame": 2.039,
+        "pipeline_percent": 3.695
+      },
+      "video_encode_write": {
+        "calls": 7501,
+        "total_ms": 125526.0,
+        "average_ms_per_call": 16.735,
+        "average_ms_per_frame": 16.735,
+        "pipeline_percent": 30.319
+      },
+      "image_write": {
+        "calls": 26,
+        "total_ms": 252.0,
+        "average_ms_per_call": 9.692,
+        "average_ms_per_frame": 0.034,
+        "pipeline_percent": 0.061
+      },
+      "event_finalize_csv": {
+        "calls": 7502,
+        "total_ms": 348.0,
+        "average_ms_per_call": 0.046,
+        "average_ms_per_frame": 0.046,
+        "pipeline_percent": 0.084
+      },
+      "cleanup": {
+        "calls": 1,
+        "total_ms": 3.0,
+        "average_ms_per_call": 3.0,
+        "average_ms_per_frame": 0.0,
+        "pipeline_percent": 0.001
+      },
+      "ocr_gate_crop_vote": {
+        "calls": 10433,
+        "total_ms": 202.0,
+        "average_ms_per_call": 0.019,
+        "average_ms_per_frame": 0.027,
+        "pipeline_percent": 0.049
+      },
+      "ocr_reader_total": {
+        "calls": 4369,
+        "total_ms": 37879.0,
+        "average_ms_per_call": 8.67,
+        "average_ms_per_frame": 5.05,
+        "pipeline_percent": 9.149
+      },
+      "summary_finalize_write": {
+        "calls": 1,
+        "total_ms": 6.363,
+        "average_ms_per_call": 6.363,
+        "average_ms_per_frame": 0.001,
+        "pipeline_percent": 0.002
+      },
+      "python_logging_and_unattributed": {
+        "calls": 7501,
+        "total_ms": 338.903,
+        "average_ms_per_call": 0.045,
+        "average_ms_per_frame": 0.045,
+        "pipeline_percent": 0.082
+      }
+    },
+    "ocr_reader_breakdown": {
+      "color_localization": {
+        "calls": 4369,
+        "total_ms": 6239.754,
+        "average_ms_per_call": 1.428,
+        "average_ms_per_frame": 0.832
+      },
+      "band_prepare_and_other_cpu": {
+        "calls": 4369,
+        "total_ms": 4615.203,
+        "average_ms_per_call": 1.056,
+        "average_ms_per_frame": 0.615
+      },
+      "four_ocr_models": {
+        "calls": 4369,
+        "total_ms": 26986.812,
+        "average_ms_per_call": 6.177,
+        "average_ms_per_frame": 3.598
+      },
+      "character_decoder": {
+        "calls": 591,
+        "total_ms": 37.231,
+        "average_ms_per_call": 0.063,
+        "average_ms_per_frame": 0.005
+      }
+    },
+    "event_output_detail": {
+      "csv_write_and_flush": {
+        "calls": 26,
+        "total_ms": 3.967,
+        "average_ms_per_call": 0.153,
+        "average_ms_per_frame": 0.001
+      }
+    },
+    "model_breakdown": {
+      "preprocessing_and_input_transfer": {
+        "total_ms": 31029.981,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 26681.707,
+            "average_ms_per_call": 3.557,
+            "average_ms_per_frame": 3.557,
+            "inputs": 7501,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 18029.571,
+                "average_ms_per_call": 2.404,
+                "average_ms_per_frame": 2.404
+              },
+              "tensor_conversion": {
+                "total_ms": 654.545,
+                "average_ms_per_call": 0.087,
+                "average_ms_per_frame": 0.087
+              },
+              "cpu_to_gpu": {
+                "total_ms": 5573.394,
+                "average_ms_per_call": 0.743,
+                "average_ms_per_frame": 0.743
+              },
+              "tensor_prepare": {
+                "total_ms": 2424.197,
+                "average_ms_per_call": 0.323,
+                "average_ms_per_frame": 0.323
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 315.073,
+            "average_ms_per_call": 0.533,
+            "average_ms_per_frame": 0.042,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 115.976,
+                "average_ms_per_call": 0.196,
+                "average_ms_per_frame": 0.015
+              },
+              "tensor_conversion": {
+                "total_ms": 16.645,
+                "average_ms_per_call": 0.028,
+                "average_ms_per_frame": 0.002
+              },
+              "cpu_to_gpu": {
+                "total_ms": 70.754,
+                "average_ms_per_call": 0.12,
+                "average_ms_per_frame": 0.009
+              },
+              "tensor_prepare": {
+                "total_ms": 111.698,
+                "average_ms_per_call": 0.189,
+                "average_ms_per_frame": 0.015
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 291.615,
+            "average_ms_per_call": 0.493,
+            "average_ms_per_frame": 0.039,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 118.129,
+                "average_ms_per_call": 0.2,
+                "average_ms_per_frame": 0.016
+              },
+              "tensor_conversion": {
+                "total_ms": 14.428,
+                "average_ms_per_call": 0.024,
+                "average_ms_per_frame": 0.002
+              },
+              "cpu_to_gpu": {
+                "total_ms": 61.256,
+                "average_ms_per_call": 0.104,
+                "average_ms_per_frame": 0.008
+              },
+              "tensor_prepare": {
+                "total_ms": 97.802,
+                "average_ms_per_call": 0.165,
+                "average_ms_per_frame": 0.013
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 565,
+            "total_ms": 2003.348,
+            "average_ms_per_call": 3.546,
+            "average_ms_per_frame": 0.267,
+            "inputs": 3676,
+            "average_inputs_per_call": 6.506,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 1499.531,
+                "average_ms_per_call": 2.654,
+                "average_ms_per_frame": 0.2
+              },
+              "tensor_conversion": {
+                "total_ms": 42.784,
+                "average_ms_per_call": 0.076,
+                "average_ms_per_frame": 0.006
+              },
+              "cpu_to_gpu": {
+                "total_ms": 85.644,
+                "average_ms_per_call": 0.152,
+                "average_ms_per_frame": 0.011
+              },
+              "tensor_prepare": {
+                "total_ms": 375.389,
+                "average_ms_per_call": 0.664,
+                "average_ms_per_frame": 0.05
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 546,
+            "total_ms": 1738.238,
+            "average_ms_per_call": 3.184,
+            "average_ms_per_frame": 0.232,
+            "inputs": 3576,
+            "average_inputs_per_call": 6.549,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 1342.891,
+                "average_ms_per_call": 2.46,
+                "average_ms_per_frame": 0.179
+              },
+              "tensor_conversion": {
+                "total_ms": 39.92,
+                "average_ms_per_call": 0.073,
+                "average_ms_per_frame": 0.005
+              },
+              "cpu_to_gpu": {
+                "total_ms": 84.24,
+                "average_ms_per_call": 0.154,
+                "average_ms_per_frame": 0.011
+              },
+              "tensor_prepare": {
+                "total_ms": 271.188,
+                "average_ms_per_call": 0.497,
+                "average_ms_per_frame": 0.036
+              }
+            }
+          }
+        }
+      },
+      "model_execution": {
+        "total_ms": 164684.267,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 144290.163,
+            "average_ms_per_call": 19.236,
+            "average_ms_per_frame": 19.236,
+            "inputs": 7501,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 36.963,
+                "average_ms_per_call": 0.005,
+                "average_ms_per_frame": 0.005
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 6680.788,
+            "average_ms_per_call": 11.304,
+            "average_ms_per_frame": 0.891,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 16.624,
+                "average_ms_per_call": 0.028,
+                "average_ms_per_frame": 0.002
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 6395.77,
+            "average_ms_per_call": 10.822,
+            "average_ms_per_frame": 0.853,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 15.998,
+                "average_ms_per_call": 0.027,
+                "average_ms_per_frame": 0.002
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 565,
+            "total_ms": 3816.459,
+            "average_ms_per_call": 6.755,
+            "average_ms_per_frame": 0.509,
+            "inputs": 3676,
+            "average_inputs_per_call": 6.506,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 8.446,
+                "average_ms_per_call": 0.015,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 546,
+            "total_ms": 3501.087,
+            "average_ms_per_call": 6.412,
+            "average_ms_per_frame": 0.467,
+            "inputs": 3576,
+            "average_inputs_per_call": 6.549,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 5.904,
+                "average_ms_per_call": 0.011,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          }
+        }
+      },
+      "postprocessing_and_tracking": {
+        "total_ms": 22732.558,
+        "model_postprocessing_ms": 15720.6,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 13476.166,
+            "average_ms_per_call": 1.797,
+            "average_ms_per_frame": 1.797,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 10579.516,
+                "average_ms_per_call": 1.41,
+                "average_ms_per_frame": 1.41
+              },
+              "result_parsing": {
+                "total_ms": 3125.592,
+                "average_ms_per_call": 0.417,
+                "average_ms_per_frame": 0.417
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 1098.925,
+            "average_ms_per_call": 1.859,
+            "average_ms_per_frame": 0.147,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 836.421,
+                "average_ms_per_call": 1.415,
+                "average_ms_per_frame": 0.112
+              },
+              "result_parsing": {
+                "total_ms": 264.486,
+                "average_ms_per_call": 0.448,
+                "average_ms_per_frame": 0.035
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 1047.681,
+            "average_ms_per_call": 1.773,
+            "average_ms_per_frame": 0.14,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 795.52,
+                "average_ms_per_call": 1.346,
+                "average_ms_per_frame": 0.106
+              },
+              "result_parsing": {
+                "total_ms": 254.004,
+                "average_ms_per_call": 0.43,
+                "average_ms_per_frame": 0.034
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 565,
+            "total_ms": 52.332,
+            "average_ms_per_call": 0.093,
+            "average_ms_per_frame": 0.007,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 2.068,
+                "average_ms_per_call": 0.004,
+                "average_ms_per_frame": 0.0
+              },
+              "result_parsing": {
+                "total_ms": 52.332,
+                "average_ms_per_call": 0.093,
+                "average_ms_per_frame": 0.007
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 546,
+            "total_ms": 45.496,
+            "average_ms_per_call": 0.083,
+            "average_ms_per_frame": 0.006,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 1.164,
+                "average_ms_per_call": 0.002,
+                "average_ms_per_frame": 0.0
+              },
+              "result_parsing": {
+                "total_ms": 45.496,
+                "average_ms_per_call": 0.083,
+                "average_ms_per_frame": 0.006
+              }
+            }
+          }
+        },
+        "bytetrack": {
+          "calls": 7501,
+          "total_ms": 7011.958,
+          "average_ms_per_call": 0.935,
+          "average_ms_per_frame": 0.935
+        }
+      }
+    }
+  },
+  "tensorrt": {
+    "run": {
+      "frames": 7501,
+      "detections": 10483,
+      "ocr_attempts": 4369,
+      "events": 26,
+      "pipeline_wall": {
+        "calls": 1,
+        "total_ms": 383153.853,
+        "average_ms_per_call": 383153.853,
+        "average_ms_per_frame": 51.08
+      },
+      "configuration": {
+        "save_video": true,
+        "dump_plate_crops": false,
+        "cuda_synchronized": true
+      }
+    },
+    "pipeline_stages": {
+      "video_setup": {
+        "calls": 1,
+        "total_ms": 12.0,
+        "average_ms_per_call": 12.0,
+        "average_ms_per_frame": 0.002,
+        "pipeline_percent": 0.003
+      },
+      "vehicle_model_load": {
+        "calls": 1,
+        "total_ms": 683.0,
+        "average_ms_per_call": 683.0,
+        "average_ms_per_frame": 0.091,
+        "pipeline_percent": 0.178
+      },
+      "ocr_model_load": {
+        "calls": 1,
+        "total_ms": 1585.0,
+        "average_ms_per_call": 1585.0,
+        "average_ms_per_frame": 0.211,
+        "pipeline_percent": 0.414
+      },
+      "video_writer_setup": {
+        "calls": 1,
+        "total_ms": 1.0,
+        "average_ms_per_call": 1.0,
+        "average_ms_per_frame": 0.0,
+        "pipeline_percent": 0.0
+      },
+      "video_decode": {
+        "calls": 7502,
+        "total_ms": 31444.0,
+        "average_ms_per_call": 4.191,
+        "average_ms_per_frame": 4.192,
+        "pipeline_percent": 8.207
+      },
+      "vehicle_detect": {
+        "calls": 7501,
+        "total_ms": 183640.0,
+        "average_ms_per_call": 24.482,
+        "average_ms_per_frame": 24.482,
+        "pipeline_percent": 47.929
+      },
+      "event_logic": {
+        "calls": 7501,
+        "total_ms": 1061.0,
+        "average_ms_per_call": 0.141,
+        "average_ms_per_frame": 0.141,
+        "pipeline_percent": 0.277
+      },
+      "render_annotation": {
+        "calls": 7501,
+        "total_ms": 13678.0,
+        "average_ms_per_call": 1.823,
+        "average_ms_per_frame": 1.823,
+        "pipeline_percent": 3.57
+      },
+      "video_encode_write": {
+        "calls": 7501,
+        "total_ms": 121992.0,
+        "average_ms_per_call": 16.263,
+        "average_ms_per_frame": 16.263,
+        "pipeline_percent": 31.839
+      },
+      "image_write": {
+        "calls": 26,
+        "total_ms": 217.0,
+        "average_ms_per_call": 8.346,
+        "average_ms_per_frame": 0.029,
+        "pipeline_percent": 0.057
+      },
+      "event_finalize_csv": {
+        "calls": 7502,
+        "total_ms": 302.0,
+        "average_ms_per_call": 0.04,
+        "average_ms_per_frame": 0.04,
+        "pipeline_percent": 0.079
+      },
+      "cleanup": {
+        "calls": 1,
+        "total_ms": 1.0,
+        "average_ms_per_call": 1.0,
+        "average_ms_per_frame": 0.0,
+        "pipeline_percent": 0.0
+      },
+      "ocr_gate_crop_vote": {
+        "calls": 10433,
+        "total_ms": 169.0,
+        "average_ms_per_call": 0.016,
+        "average_ms_per_frame": 0.023,
+        "pipeline_percent": 0.044
+      },
+      "ocr_reader_total": {
+        "calls": 4369,
+        "total_ms": 27881.0,
+        "average_ms_per_call": 6.382,
+        "average_ms_per_frame": 3.717,
+        "pipeline_percent": 7.277
+      },
+      "summary_finalize_write": {
+        "calls": 1,
+        "total_ms": 4.13,
+        "average_ms_per_call": 4.13,
+        "average_ms_per_frame": 0.001,
+        "pipeline_percent": 0.001
+      },
+      "python_logging_and_unattributed": {
+        "calls": 7501,
+        "total_ms": 483.723,
+        "average_ms_per_call": 0.064,
+        "average_ms_per_frame": 0.064,
+        "pipeline_percent": 0.126
+      }
+    },
+    "ocr_reader_breakdown": {
+      "color_localization": {
+        "calls": 4369,
+        "total_ms": 6067.379,
+        "average_ms_per_call": 1.389,
+        "average_ms_per_frame": 0.809
+      },
+      "band_prepare_and_other_cpu": {
+        "calls": 4369,
+        "total_ms": 3958.847,
+        "average_ms_per_call": 0.906,
+        "average_ms_per_frame": 0.528
+      },
+      "four_ocr_models": {
+        "calls": 4369,
+        "total_ms": 17821.021,
+        "average_ms_per_call": 4.079,
+        "average_ms_per_frame": 2.376
+      },
+      "character_decoder": {
+        "calls": 591,
+        "total_ms": 33.753,
+        "average_ms_per_call": 0.057,
+        "average_ms_per_frame": 0.004
+      }
+    },
+    "event_output_detail": {
+      "csv_write_and_flush": {
+        "calls": 26,
+        "total_ms": 3.33,
+        "average_ms_per_call": 0.128,
+        "average_ms_per_frame": 0.0
+      }
+    },
+    "model_breakdown": {
+      "preprocessing_and_input_transfer": {
+        "total_ms": 28775.297,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 24939.501,
+            "average_ms_per_call": 3.325,
+            "average_ms_per_frame": 3.325,
+            "inputs": 7501,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 17060.492,
+                "average_ms_per_call": 2.274,
+                "average_ms_per_frame": 2.274
+              },
+              "tensor_conversion": {
+                "total_ms": 529.732,
+                "average_ms_per_call": 0.071,
+                "average_ms_per_frame": 0.071
+              },
+              "cpu_to_gpu": {
+                "total_ms": 5208.436,
+                "average_ms_per_call": 0.694,
+                "average_ms_per_frame": 0.694
+              },
+              "tensor_prepare": {
+                "total_ms": 2140.841,
+                "average_ms_per_call": 0.285,
+                "average_ms_per_frame": 0.285
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 293.478,
+            "average_ms_per_call": 0.497,
+            "average_ms_per_frame": 0.039,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 92.38,
+                "average_ms_per_call": 0.156,
+                "average_ms_per_frame": 0.012
+              },
+              "tensor_conversion": {
+                "total_ms": 14.997,
+                "average_ms_per_call": 0.025,
+                "average_ms_per_frame": 0.002
+              },
+              "cpu_to_gpu": {
+                "total_ms": 84.113,
+                "average_ms_per_call": 0.142,
+                "average_ms_per_frame": 0.011
+              },
+              "tensor_prepare": {
+                "total_ms": 101.988,
+                "average_ms_per_call": 0.173,
+                "average_ms_per_frame": 0.014
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 264.399,
+            "average_ms_per_call": 0.447,
+            "average_ms_per_frame": 0.035,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 83.746,
+                "average_ms_per_call": 0.142,
+                "average_ms_per_frame": 0.011
+              },
+              "tensor_conversion": {
+                "total_ms": 12.914,
+                "average_ms_per_call": 0.022,
+                "average_ms_per_frame": 0.002
+              },
+              "cpu_to_gpu": {
+                "total_ms": 76.838,
+                "average_ms_per_call": 0.13,
+                "average_ms_per_frame": 0.01
+              },
+              "tensor_prepare": {
+                "total_ms": 90.901,
+                "average_ms_per_call": 0.154,
+                "average_ms_per_frame": 0.012
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 571,
+            "total_ms": 1760.23,
+            "average_ms_per_call": 3.083,
+            "average_ms_per_frame": 0.235,
+            "inputs": 3769,
+            "average_inputs_per_call": 6.601,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 1386.95,
+                "average_ms_per_call": 2.429,
+                "average_ms_per_frame": 0.185
+              },
+              "tensor_conversion": {
+                "total_ms": 33.7,
+                "average_ms_per_call": 0.059,
+                "average_ms_per_frame": 0.004
+              },
+              "cpu_to_gpu": {
+                "total_ms": 81.012,
+                "average_ms_per_call": 0.142,
+                "average_ms_per_frame": 0.011
+              },
+              "tensor_prepare": {
+                "total_ms": 258.568,
+                "average_ms_per_call": 0.453,
+                "average_ms_per_frame": 0.034
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 542,
+            "total_ms": 1517.689,
+            "average_ms_per_call": 2.8,
+            "average_ms_per_frame": 0.202,
+            "inputs": 3489,
+            "average_inputs_per_call": 6.437,
+            "breakdown": {
+              "resize_letterbox_or_classifier_transform": {
+                "total_ms": 1178.315,
+                "average_ms_per_call": 2.174,
+                "average_ms_per_frame": 0.157
+              },
+              "tensor_conversion": {
+                "total_ms": 28.451,
+                "average_ms_per_call": 0.052,
+                "average_ms_per_frame": 0.004
+              },
+              "cpu_to_gpu": {
+                "total_ms": 73.982,
+                "average_ms_per_call": 0.136,
+                "average_ms_per_frame": 0.01
+              },
+              "tensor_prepare": {
+                "total_ms": 236.94,
+                "average_ms_per_call": 0.437,
+                "average_ms_per_frame": 0.032
+              }
+            }
+          }
+        }
+      },
+      "model_execution": {
+        "total_ms": 139821.217,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 127864.801,
+            "average_ms_per_call": 17.046,
+            "average_ms_per_frame": 17.046,
+            "inputs": 7501,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 32.991,
+                "average_ms_per_call": 0.004,
+                "average_ms_per_frame": 0.004
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 2876.785,
+            "average_ms_per_call": 4.868,
+            "average_ms_per_frame": 0.384,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 4.575,
+                "average_ms_per_call": 0.008,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 2847.341,
+            "average_ms_per_call": 4.818,
+            "average_ms_per_frame": 0.38,
+            "inputs": 591,
+            "average_inputs_per_call": 1.0,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 4.564,
+                "average_ms_per_call": 0.008,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 571,
+            "total_ms": 3250.415,
+            "average_ms_per_call": 5.692,
+            "average_ms_per_frame": 0.433,
+            "inputs": 3769,
+            "average_inputs_per_call": 6.601,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 4.514,
+                "average_ms_per_call": 0.008,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 542,
+            "total_ms": 2981.875,
+            "average_ms_per_call": 5.502,
+            "average_ms_per_frame": 0.398,
+            "inputs": 3489,
+            "average_inputs_per_call": 6.437,
+            "breakdown": {
+              "first_call": {
+                "total_ms": 4.811,
+                "average_ms_per_call": 0.009,
+                "average_ms_per_frame": 0.001
+              }
+            }
+          }
+        }
+      },
+      "postprocessing_and_tracking": {
+        "total_ms": 22475.116,
+        "model_postprocessing_ms": 15597.007,
+        "models": {
+          "vehicle": {
+            "calls": 7501,
+            "total_ms": 13568.198,
+            "average_ms_per_call": 1.809,
+            "average_ms_per_frame": 1.809,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 10591.95,
+                "average_ms_per_call": 1.412,
+                "average_ms_per_frame": 1.412
+              },
+              "result_parsing": {
+                "total_ms": 2977.38,
+                "average_ms_per_call": 0.397,
+                "average_ms_per_frame": 0.397
+              }
+            }
+          },
+          "digit_detector": {
+            "calls": 591,
+            "total_ms": 1001.29,
+            "average_ms_per_call": 1.694,
+            "average_ms_per_frame": 0.133,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 764.434,
+                "average_ms_per_call": 1.293,
+                "average_ms_per_frame": 0.102
+              },
+              "result_parsing": {
+                "total_ms": 238.115,
+                "average_ms_per_call": 0.403,
+                "average_ms_per_frame": 0.032
+              }
+            }
+          },
+          "letter_detector": {
+            "calls": 591,
+            "total_ms": 929.663,
+            "average_ms_per_call": 1.573,
+            "average_ms_per_frame": 0.124,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 705.402,
+                "average_ms_per_call": 1.194,
+                "average_ms_per_frame": 0.094
+              },
+              "result_parsing": {
+                "total_ms": 225.508,
+                "average_ms_per_call": 0.382,
+                "average_ms_per_frame": 0.03
+              }
+            }
+          },
+          "digit_classifier": {
+            "calls": 571,
+            "total_ms": 49.795,
+            "average_ms_per_call": 0.087,
+            "average_ms_per_frame": 0.007,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 1.227,
+                "average_ms_per_call": 0.002,
+                "average_ms_per_frame": 0.0
+              },
+              "result_parsing": {
+                "total_ms": 49.795,
+                "average_ms_per_call": 0.087,
+                "average_ms_per_frame": 0.007
+              }
+            }
+          },
+          "letter_classifier": {
+            "calls": 542,
+            "total_ms": 48.061,
+            "average_ms_per_call": 0.089,
+            "average_ms_per_frame": 0.006,
+            "breakdown": {
+              "external_nms": {
+                "total_ms": 1.917,
+                "average_ms_per_call": 0.004,
+                "average_ms_per_frame": 0.0
+              },
+              "result_parsing": {
+                "total_ms": 48.061,
+                "average_ms_per_call": 0.089,
+                "average_ms_per_frame": 0.006
+              }
+            }
+          }
+        },
+        "bytetrack": {
+          "calls": 7501,
+          "total_ms": 6878.109,
+          "average_ms_per_call": 0.917,
+          "average_ms_per_frame": 0.917
+        }
+      }
+    }
+  },
+  "comparison": {
+    "pipeline_stages": {
+      "video_setup": {
+        "pytorch_total_ms": 144.0,
+        "tensorrt_total_ms": 12.0,
+        "saved_ms": 132.0,
+        "pytorch_ms_per_frame": 0.019,
+        "tensorrt_ms_per_frame": 0.002,
+        "speedup": 12.0
+      },
+      "vehicle_model_load": {
+        "pytorch_total_ms": 120.0,
+        "tensorrt_total_ms": 683.0,
+        "saved_ms": -563.0,
+        "pytorch_ms_per_frame": 0.016,
+        "tensorrt_ms_per_frame": 0.091,
+        "speedup": 0.176
+      },
+      "ocr_model_load": {
+        "pytorch_total_ms": 321.0,
+        "tensorrt_total_ms": 1585.0,
+        "saved_ms": -1264.0,
+        "pytorch_ms_per_frame": 0.043,
+        "tensorrt_ms_per_frame": 0.211,
+        "speedup": 0.203
+      },
+      "video_writer_setup": {
+        "pytorch_total_ms": 14.0,
+        "tensorrt_total_ms": 1.0,
+        "saved_ms": 13.0,
+        "pytorch_ms_per_frame": 0.002,
+        "tensorrt_ms_per_frame": 0.0,
+        "speedup": 14.0
+      },
+      "video_decode": {
+        "pytorch_total_ms": 29764.0,
+        "tensorrt_total_ms": 31444.0,
+        "saved_ms": -1680.0,
+        "pytorch_ms_per_frame": 3.968,
+        "tensorrt_ms_per_frame": 4.192,
+        "speedup": 0.947
+      },
+      "vehicle_detect": {
+        "pytorch_total_ms": 202668.0,
+        "tensorrt_total_ms": 183640.0,
+        "saved_ms": 19028.0,
+        "pytorch_ms_per_frame": 27.019,
+        "tensorrt_ms_per_frame": 24.482,
+        "speedup": 1.104
+      },
+      "event_logic": {
+        "pytorch_total_ms": 1130.0,
+        "tensorrt_total_ms": 1061.0,
+        "saved_ms": 69.0,
+        "pytorch_ms_per_frame": 0.151,
+        "tensorrt_ms_per_frame": 0.141,
+        "speedup": 1.065
+      },
+      "render_annotation": {
+        "pytorch_total_ms": 15296.0,
+        "tensorrt_total_ms": 13678.0,
+        "saved_ms": 1618.0,
+        "pytorch_ms_per_frame": 2.039,
+        "tensorrt_ms_per_frame": 1.823,
+        "speedup": 1.118
+      },
+      "video_encode_write": {
+        "pytorch_total_ms": 125526.0,
+        "tensorrt_total_ms": 121992.0,
+        "saved_ms": 3534.0,
+        "pytorch_ms_per_frame": 16.735,
+        "tensorrt_ms_per_frame": 16.263,
+        "speedup": 1.029
+      },
+      "image_write": {
+        "pytorch_total_ms": 252.0,
+        "tensorrt_total_ms": 217.0,
+        "saved_ms": 35.0,
+        "pytorch_ms_per_frame": 0.034,
+        "tensorrt_ms_per_frame": 0.029,
+        "speedup": 1.161
+      },
+      "event_finalize_csv": {
+        "pytorch_total_ms": 348.0,
+        "tensorrt_total_ms": 302.0,
+        "saved_ms": 46.0,
+        "pytorch_ms_per_frame": 0.046,
+        "tensorrt_ms_per_frame": 0.04,
+        "speedup": 1.152
+      },
+      "cleanup": {
+        "pytorch_total_ms": 3.0,
+        "tensorrt_total_ms": 1.0,
+        "saved_ms": 2.0,
+        "pytorch_ms_per_frame": 0.0,
+        "tensorrt_ms_per_frame": 0.0,
+        "speedup": 3.0
+      },
+      "ocr_gate_crop_vote": {
+        "pytorch_total_ms": 202.0,
+        "tensorrt_total_ms": 169.0,
+        "saved_ms": 33.0,
+        "pytorch_ms_per_frame": 0.027,
+        "tensorrt_ms_per_frame": 0.023,
+        "speedup": 1.195
+      },
+      "ocr_reader_total": {
+        "pytorch_total_ms": 37879.0,
+        "tensorrt_total_ms": 27881.0,
+        "saved_ms": 9998.0,
+        "pytorch_ms_per_frame": 5.05,
+        "tensorrt_ms_per_frame": 3.717,
+        "speedup": 1.359
+      },
+      "summary_finalize_write": {
+        "pytorch_total_ms": 6.363,
+        "tensorrt_total_ms": 4.13,
+        "saved_ms": 2.233,
+        "pytorch_ms_per_frame": 0.001,
+        "tensorrt_ms_per_frame": 0.001,
+        "speedup": 1.541
+      },
+      "python_logging_and_unattributed": {
+        "pytorch_total_ms": 338.903,
+        "tensorrt_total_ms": 483.723,
+        "saved_ms": -144.82,
+        "pytorch_ms_per_frame": 0.045,
+        "tensorrt_ms_per_frame": 0.064,
+        "speedup": 0.701
+      }
+    }
+  }
+}

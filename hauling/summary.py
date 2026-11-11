@@ -88,7 +88,44 @@ def initialize_summary(options: RunOptions, config: Config) -> dict:
         "plate_reads_debug": {},
         "_speeds": [],
         "duration_seconds": 0.0,
-        "timing_seconds": {"video_decode": 0.0, "vehicle_detect": 0.0, "plate_read": 0.0},
+        "timing_seconds": {
+            key: 0.0
+            for key in (
+                "video_setup",
+                "vehicle_model_load",
+                "ocr_model_load",
+                "video_writer_setup",
+                "video_decode",
+                "vehicle_detect",
+                "ocr_gate_vote",
+                "plate_read",
+                "event_logic",
+                "render_annotation",
+                "video_encode_write",
+                "image_write",
+                "event_finalize_csv",
+                "cleanup",
+            )
+        },
+        "timing_calls": {
+            key: 0
+            for key in (
+                "video_setup",
+                "vehicle_model_load",
+                "ocr_model_load",
+                "video_writer_setup",
+                "video_decode",
+                "vehicle_detect",
+                "ocr_gate_vote",
+                "plate_read",
+                "event_logic",
+                "render_annotation",
+                "video_encode_write",
+                "image_write",
+                "event_finalize_csv",
+                "cleanup",
+            )
+        },
         "warnings": [],
         "errors": [],
         "status": "running",

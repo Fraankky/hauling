@@ -66,8 +66,15 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
     dumped_counts: dict[int, int] = {}  # per-track diagnostic dumps written
     capture, writer = None, None
     failure = None
+
+    def record_timing(name: str, step_started: float, calls: int = 1) -> None:
+        summary["timing_seconds"][name] += time.monotonic() - step_started
+        summary["timing_calls"][name] += calls
+
     try:
+        step_started = time.monotonic()
         capture = cv2.VideoCapture(str(options.video.resolve()))
+        record_timing("video_setup", step_started)
         if not capture.isOpened():
             raise ValueError("Video cannot be decoded; check the file and installed codecs")
         fps = capture.get(cv2.CAP_PROP_FPS)
@@ -106,6 +113,7 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
         if detector is None:
             if options.vehicle_model is None or options.tracker_config is None:
                 raise ValueError("Vehicle model and tracker configuration are required")
+            step_started = time.monotonic()
             detector = VehicleDetector(
                 options.vehicle_model,
                 options.tracker_config,
@@ -115,11 +123,14 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                 options.output_dir / "runtime",
                 options.threads,
             )
+            record_timing("vehicle_model_load", step_started)
         summary["device"] = detector.device
         summary["model_classes"] = detector.model_names
+        step_started = time.monotonic()
         character_reader = create_plate_reader(
             options, config, detector.device, options.output_dir / "runtime"
         )
+        record_timing("ocr_model_load", step_started)
         if character_reader is not None:
             summary["warnings"].append("Lambung (cab sign) reading enabled")
             summary["plate_calibration"] = plate_calibration(config)
@@ -134,7 +145,9 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
             summary["versions"]["tensorrt"] = tensorrt.__version__
         if options.save_video:
             try:
+                step_started = time.monotonic()
                 writer = open_video_writer(options.output_dir / "annotated.mp4", fps, size)
+                record_timing("video_writer_setup", step_started)
             except (OSError, cv2.error) as error:
                 summary["warnings"].append(f"Video disabled: {error}")
         index, previous_pts = 0, None
@@ -144,7 +157,7 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
             while options.max_frames is None or index < options.max_frames:
                 step_started = time.monotonic()
                 ok, frame = capture.read()
-                summary["timing_seconds"]["video_decode"] += time.monotonic() - step_started
+                record_timing("video_decode", step_started)
                 if not ok:
                     summary["stop_reason"] = "eof"
                     break
@@ -160,8 +173,9 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                 timestamp = index / fps
                 step_started = time.monotonic()
                 observations = detector.detect(frame)
-                summary["timing_seconds"]["vehicle_detect"] += time.monotonic() - step_started
+                record_timing("vehicle_detect", step_started)
                 summary["total_detections"] += len(observations)
+                logic_started = time.monotonic()
                 for observation in observations:
                     if observation.track_id is None:
                         continue
@@ -210,6 +224,8 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                                 verdict.coverage,
                             )
                     if character_reader is not None:
+                        record_timing("event_logic", logic_started, calls=0)
+                        step_started = time.monotonic()
                         process_plate_observation(
                             character_reader,
                             frame,
@@ -224,6 +240,8 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                             dumped_counts,
                             formats,
                         )
+                        record_timing("ocr_gate_vote", step_started)
+                        logic_started = time.monotonic()
                     speed = measurement(state, config)
                     measurements[track_id] = speed
                     if before[0] is None and state.start_timestamp is not None:
@@ -249,14 +267,22 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                             crop_dir.mkdir(parents=True, exist_ok=True)
                             clipped = clip_vehicle_box(x1, y1, x2, y2, frame.shape[1], frame.shape[0])
                             if clipped is not None:
-                                cv2.imwrite(
-                                    str(crop_dir / f"trk{track_id:03d}_f{index:06d}.png"),
-                                    frame[clipped[1]:clipped[3], clipped[0]:clipped[2]],
-                                )
+                                record_timing("event_logic", logic_started, calls=0)
+                                step_started = time.monotonic()
+                                try:
+                                    cv2.imwrite(
+                                        str(crop_dir / f"trk{track_id:03d}_f{index:06d}.png"),
+                                        frame[clipped[1]:clipped[3], clipped[0]:clipped[2]],
+                                    )
+                                finally:
+                                    record_timing("image_write", step_started)
+                                    logic_started = time.monotonic()
                         except OSError as error:
                             LOGGER.warning("event crop failed frame=%s: %s", index, error)
+                record_timing("event_logic", logic_started)
                 processing_fps = (index + 1) / max(time.monotonic() - frames_started, 1e-9)
                 if pending_evidence:
+                    step_started = time.monotonic()
                     annotated = draw_frame(
                         frame,
                         draw_polygons,
@@ -269,55 +295,71 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
                         video_fps=fps,
                         processing_fps=processing_fps,
                     )
+                    record_timing("render_annotation", step_started)
                     evidence_dir = options.output_dir / "contraflow"
                     evidence_dir.mkdir(parents=True, exist_ok=True)
                     for evidence_track in pending_evidence:
-                        cv2.imwrite(
-                            str(evidence_dir / f"trk{evidence_track:03d}_f{index:06d}.png"),
-                            annotated,
-                        )
+                        step_started = time.monotonic()
+                        try:
+                            cv2.imwrite(
+                                str(evidence_dir / f"trk{evidence_track:03d}_f{index:06d}.png"),
+                                annotated,
+                            )
+                        finally:
+                            record_timing("image_write", step_started)
                         summary["contraflow_evidence"] += 1
                     pending_evidence = []
                 if writer is not None:
                     try:
-                        writer.write(
-                            draw_frame(
-                                frame,
-                                draw_polygons,
-                                observations,
-                                states,
-                                measurements,
-                                timestamp,
-                                plate_enabled,
-                                config.vehicle_anchor,
-                                video_fps=fps,
-                                processing_fps=processing_fps,
-                            )
+                        step_started = time.monotonic()
+                        annotated = draw_frame(
+                            frame,
+                            draw_polygons,
+                            observations,
+                            states,
+                            measurements,
+                            timestamp,
+                            plate_enabled,
+                            config.vehicle_anchor,
+                            video_fps=fps,
+                            processing_fps=processing_fps,
                         )
+                        record_timing("render_annotation", step_started)
+                        step_started = time.monotonic()
+                        writer.write(annotated)
+                        record_timing("video_encode_write", step_started)
                         summary["video_written"] = True
                     except (OSError, cv2.error) as error:
                         writer.release()
                         writer = None
                         summary["warnings"].append(f"Video writer stopped: {error}")
                         summary["video_written"] = False
-                flush_pending_events(
-                    states, events, config, options.video, summary, plate_enabled,
-                    current_frame=index,
-                    timeout_frames=plate_timeout_frames,
-                    plate_min_prob=options.plate_min_prob,
-                    plate_single_read_prob=single_read_prob,
-                )
+                step_started = time.monotonic()
+                try:
+                    flush_pending_events(
+                        states, events, config, options.video, summary, plate_enabled,
+                        current_frame=index,
+                        timeout_frames=plate_timeout_frames,
+                        plate_min_prob=options.plate_min_prob,
+                        plate_single_read_prob=single_read_prob,
+                    )
+                finally:
+                    record_timing("event_finalize_csv", step_started)
                 index += 1
                 if time.monotonic() - last_progress >= 30:
                     LOGGER.info("progress frames=%s video_time=%.1fs events=%s", index, timestamp, summary["events"])
                     last_progress = time.monotonic()
             else:
                 summary["stop_reason"] = "max_frames"
-            flush_pending_events(
-                states, events, config, options.video, summary, plate_enabled,
-                plate_min_prob=options.plate_min_prob,
-                plate_single_read_prob=single_read_prob,
-            )
+            step_started = time.monotonic()
+            try:
+                flush_pending_events(
+                    states, events, config, options.video, summary, plate_enabled,
+                    plate_min_prob=options.plate_min_prob,
+                    plate_single_read_prob=single_read_prob,
+                )
+            finally:
+                record_timing("event_finalize_csv", step_started)
         if summary["total_frames"] == 0:
             raise ValueError("Video contained no readable frames")
         if summary["stop_reason"] == "eof" and 0 < reported_frames != index:
@@ -334,10 +376,12 @@ def run_pipeline(options: RunOptions, config: Config, detector: Any = None) -> d
         summary["errors"].append(f"{type(error).__name__}: {error}")
         failure = error
     finally:
+        step_started = time.monotonic()
         if capture is not None:
             capture.release()
         if writer is not None:
             writer.release()
+        record_timing("cleanup", step_started)
         finalize_summary(
             summary, config, states, polygons, measurements, options.output_dir, started
         )

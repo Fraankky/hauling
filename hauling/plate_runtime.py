@@ -199,6 +199,7 @@ def process_plate_observation(
             lambung = reader.read(crop)
         finally:
             summary["timing_seconds"]["plate_read"] += time.monotonic() - step_started
+            summary["timing_calls"]["plate_read"] += 1
         summary["ocr_frames"] += 1
         state.ocr_attempts += 1
         summary["ocr_attempts"] += 1
